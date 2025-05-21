@@ -20,6 +20,7 @@ public class testIncidentes   {
     static WebDriver driver;
     static String title;
     static WebDriverWait wait;
+    static Random random;
 
     //Antes de empezar a correr los tests, se va a realizar login
     @BeforeAll
@@ -28,8 +29,10 @@ public class testIncidentes   {
         System.setProperty("webdriver.chrome.driver", "C:\\ChromeDriver\\chromedriver-win64\\chromedriver.exe");
         driver = new ChromeDriver();
         wait = new WebDriverWait(driver, Duration.ofSeconds(100));
-        driver.get("https://seguridad-test.ubicuo.com.ar");
+       // driver.get("https://seguridad-test.ubicuo.com.ar");
+        driver.get("http://localhost:3300/");
         driver.manage().window().maximize();
+        random = new Random();
 
         WebElement user = driver.findElement(By.id("Email"));
         WebElement pass = driver.findElement(By.id("Password"));
@@ -49,105 +52,75 @@ public class testIncidentes   {
     //Abre el formulario de accidente contratista
     @Test
     void guardarALPC() {
-        //ir a la pagina de incidentes del establecimiento 1285 corroborando estar en la pagina correcta
-        driver.get("https://seguridad-test.ubicuo.com.ar/Establecimiento/Incidentes/1285");
+        //driver.get("https://seguridad-test.ubicuo.com.ar/Incidente/NuevoIncidenteContratista/1285");
+        driver.get("http://localhost:3300/Incidente/NuevoIncidenteContratista/1277");
         title = driver.getTitle();
-        assertEquals("Buenos Aires Sur - Incidentes Tres Arroyos", title);
+        assertEquals("La Plata - Nuevo Accidente Laboral Contratista", title);
 
-        //Buscar elementos menu
-        //menu hamburguesa
-        WebElement hamburguerMenu = driver.findElement(By.xpath("/html/body/div[1]/div/div[1]/a/i"));
-        hamburguerMenu.click();
-        //opcion nuevo
-        WebElement incidentesMenu = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@href='#menu-incidentes']")));
-        incidentesMenu.click();
-        //opcion Accidente Laboral Contratista
-        WebElement contratista = wait.until(ExpectedConditions.elementToBeClickable(By.linkText("ACCIDENTE LABORAL CONTRATISTA")));
-        contratista.click();
+        ProcesarComboEmpresa();
+        ProcesarComboNombreObra();
+//        ProcesarComboCodigoObra();
+//        ProcesarComboNroContrato();
+        ProcesarSeccionDatosAfectado();
+        ProcesarSeccionTipoAccidente();
 
-        //Combo empresa
+        driver.findElement(By.xpath("//input[@value='Siguiente']")).click();
+
+    }
+
+    //METODOS
+    private static void ProcesarComboEmpresa() {
+//        WebElement comboEmpresa = wait.until(ExpectedConditions.presenceOfElementLocated(
+//                By.xpath("/html/body/div[1]/div/div[1]/div/div[2]/form/div/div[2]/div[1]/div[2]/div[1]/div/a")));
+
         WebElement comboEmpresa = wait.until(ExpectedConditions.presenceOfElementLocated(
-                By.xpath("/html/body/div[1]/div/div[1]/div/div[2]/form/div/div[2]/div[1]/div[2]/div[1]/div/a")));
+                By.id("s2id_nombre-empresa")));
+
         comboEmpresa.click();
-
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("select2-drop")));
-
         List<WebElement> opcionesEmpresa = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
                 By.xpath("//div[contains(@class, 'select2-result-label')]")
         ));
+        opcionesEmpresa.get(random.nextInt(opcionesEmpresa.size())).click();
+    }
 
-        // Seleccionar un índice aleatorio
-        Random rand = new Random();
-        int indiceAleatorio = rand.nextInt(opcionesEmpresa.size());
-
-        // Hacer clic en la opción seleccionada
-        opcionesEmpresa.get(indiceAleatorio).click();
-
- //        //Combo nombre obra
+    private static void ProcesarComboNombreObra(){
         WebElement comboNombreObra = wait.until(ExpectedConditions.presenceOfElementLocated(
                 By.id("s2id_obra-contratista")));
         comboNombreObra.click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("s2id_obra-contratista")));
-        List<WebElement> opcionesComboObra = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
-                By.xpath("//div[contains(@class, 'select2-result-label')]")
+
+        List<WebElement> opcionesComboObra = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
+                By.id("s2id_obra-contratista") , 0));
+        int opcion = random.nextInt(opcionesComboObra.size());
+        opcionesComboObra.get(1).click();
+     }
+
+    private static void ProcesarComboCodigoObra(){
+
+        WebElement comboCodigoObra = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("")));
+        comboCodigoObra.click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("")));
+        List<WebElement> opcionesComboCodigoObra = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
+                By.xpath("")
         ));
+        opcionesComboCodigoObra.get(random.nextInt(opcionesComboCodigoObra.size())).click();
+    }
 
-        // Seleccionar un índice aleatorio
-        rand = new Random();
-        indiceAleatorio = rand.nextInt(opcionesComboObra.size());
-
-        // Hacer clic en la opción seleccionada
-        opcionesComboObra.get(indiceAleatorio).click();
-
-
-//        //wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"select2-drop\"]")));
-//
-//        List<WebElement> opcionesNombreObra = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
-//                By.id("select2-results-4020")
-//        ));
-//
-//       int indiceNombreObra = rand.nextInt(opcionesNombreObra.size());
-//       opcionesNombreObra.get(indiceNombreObra).click();
-
-        // Esperar hasta que el combo sea visible
+    private static void ProcesarComboNroContrato(){
+        WebElement comboComboNroContrato = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("")));
+        comboComboNroContrato.click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("")));
+        List<WebElement> opcionesComboNroContrato = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
+                By.xpath("")
+        ));
+        opcionesComboNroContrato.get(random.nextInt(opcionesComboNroContrato.size())).click();
 
 
+    }
 
-
-//        WebElement opcionObra = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(@class, 'select2-result-label') and normalize-space(text())='PROTAN S.A']")));
-//        opcionObra.click();
-//
-//        WebElement comboCodigoObra = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body/div[1]/div/div[1]/div/div[2]/form/div/div[2]/div[1]/div[2]/div[1]/div/a")));
-//        comboCodigoObra.click();
-//        WebElement opcionCodigoObra = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(@class, 'select2-result-label') and normalize-space(text())='PROTAN S.A']")));
-//        opcionCodigoObra.click();
-//
-//        WebElement comboContrato = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body/div[1]/div/div[1]/div/div[2]/form/div/div[2]/div[1]/div[2]/div[1]/div/a")));
-//        comboContrato.click();
-//        WebElement opcionContrato = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(@class, 'select2-result-label') and normalize-space(text())='PROTAN S.A']")));
-//        opcionContrato.click();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private static void ProcesarSeccionDatosAfectado(){
 
         //Seccion datos del afectado
         WebElement nombre = driver.findElement(By.id("personal"));
@@ -160,32 +133,23 @@ public class testIncidentes   {
         calendario.sendKeys("02/04/1992");
         calendario.sendKeys(Keys.ENTER);
         puesto.sendKeys("QA");
+    }
 
-        //Seccion Tipo de accidente
+    private static void     ProcesarSeccionTipoAccidente(){
         WebElement relacionOcasion = driver.findElement(By.xpath("//*[@id=\"s2id_taccidente-ocasion\"]/a"));
         relacionOcasion.click();
-
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("select2-drop")));
-
         WebElement opcionRelacionOcasion = driver.findElement(By.id("select2-result-label-277"));
         opcionRelacionOcasion.click();
-
-        WebElement releacionConsecuencias = driver.findElement(By.xpath("/html/body/div[1]/div/div[1]/div/div[2]/form/div/div[2]/div[1]/div[10]/div[2]/div/a"));
+        WebElement releacionConsecuencias = driver.findElement(By.xpath("//*[@id=\"s2id_taccidente-consecuencias\"]/a"));
         releacionConsecuencias.click();
-
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"select2-drop\"]")));
-
-        WebElement opcionRelacionConsecuencias = driver.findElement(By.id("select2-result-label-4831"));
+        WebElement opcionRelacionConsecuencias = driver.findElement(By.xpath("select2-result-label-21"));
         opcionRelacionConsecuencias.click();
 
-        //Localizar boton siguiente
-        WebElement btnSiguiente = driver.findElement(By.xpath("//input[@value='Siguiente']"));
-        btnSiguiente.click();
-
-
-
-
     }
+
+
 
     //Despues de terminar los tests cierra el navegador
 //    @AfterAll
